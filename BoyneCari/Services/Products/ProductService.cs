@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BoyneCari.Mapper;
+using BoyneCari.Data.Repositories.Categories;
 
 namespace BoyneCari.Services.Products
 {
@@ -15,9 +16,11 @@ namespace BoyneCari.Services.Products
     {
         #region .ctor
         private readonly IProductRepository _productRepository;
-        public ProductService(IProductRepository productRepository)
+        private readonly ICategoryRepository _categoryRepository;
+        public ProductService(IProductRepository productRepository,ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
         }
         #endregion
 
@@ -26,7 +29,10 @@ namespace BoyneCari.Services.Products
             var product = await _productRepository.GetAsync(id);
             if (product == null)
                 return null;
-            return product.ToModelGetProduct();
+            var category = await _categoryRepository.GetAsync(product.CategoryId);
+            var model = product.ToModelGetProduct();
+            model.Category = category.ToModelGetCategory();
+            return model;
         }
 
         public List<ResponseGetProduct> GetProducts()
