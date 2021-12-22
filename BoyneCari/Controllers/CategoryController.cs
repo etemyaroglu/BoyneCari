@@ -2,6 +2,7 @@
 using BoyneCari.Services.Categories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System;
 using System.Threading.Tasks;
 
@@ -21,8 +22,8 @@ namespace BoyneCari.Controllers
 
         #region Methods
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetCategoryById([FromRoute] Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById([FromRoute] string id)
         {
             return Ok(await categoryService.GetCategoryByIdAsync(id));
         }
@@ -31,7 +32,10 @@ namespace BoyneCari.Controllers
         [HttpGet("list")]
         public IActionResult GetCategories()
         {
-            return Ok(categoryService.GetCategories());
+            var category = categoryService.GetCategories();
+            if (category == null)
+                return NotFound();
+            return Ok(category);
 
         }
         [HttpGet("filter")]
@@ -48,14 +52,14 @@ namespace BoyneCari.Controllers
         }
 
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [HttpPut("{id:guid}")]
-        public IActionResult UpdateCategory([FromRoute] Guid id, [FromBody] RequestCategoryUpdate request)
+        [HttpPut("{id}")]
+        public IActionResult UpdateCategory([FromRoute] string id, [FromBody] RequestCategoryUpdate request)
         {
             return Ok(categoryService.UpdateCategory(id, request));
         }
 
-        [HttpDelete("{id:guid}")]
-        public IActionResult DeleteCategory([FromRoute] Guid id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCategory([FromRoute] string id)
         {
             categoryService.DeleteCategoryById(id);
             return Ok();

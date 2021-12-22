@@ -1,4 +1,5 @@
 ﻿using BoyneCari.Models.Entities.Base;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,11 @@ namespace BoyneCari.Data
             client = context;
             collection = client.GetCollection<T>(typeof(T).Name);
         }
-        public virtual T Get(Guid id)
+        public virtual T Get(string id)
         {
             return collection.Find<T>(x => x.Id == id).FirstOrDefault();
         }
-        public virtual async Task<T> GetAsync(Guid id)
+        public virtual async Task<T> GetAsync(string id)
         {
             return await collection.Find<T>(x => x.Id == id).FirstOrDefaultAsync();
         }
@@ -45,9 +46,13 @@ namespace BoyneCari.Data
         {
             return collection.AsQueryable();
         }
+        public virtual IMongoCollection<T> GetCollection()
+        {
+            return collection;
+        }
         public virtual T Insert(T model)
         {
-            model.Id = Guid.NewGuid();
+
             collection.InsertOne(model);
             return model;
         }
@@ -56,7 +61,7 @@ namespace BoyneCari.Data
             collection.FindOneAndReplace(x => x.Id == model.Id, model);
             
         }
-        public virtual void Delete(Guid id)
+        public virtual void Delete(string id)
         {
             collection.DeleteOne(x => x.Id == id);
         }

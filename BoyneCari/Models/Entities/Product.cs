@@ -13,15 +13,21 @@ namespace BoyneCari.Models.Entities
     {  
 
         [Required]
-        [Column("name")]
+        [BsonElement("name")]
         public string Name { get; set; }
+        [BsonElement("description")]
         public string Description { get; set; }
         [Required]
-        public Guid CategoryId { get; set; }
+        [BsonElement("categoryid")]
+        public string CategoryId { get; set; }
         [Required]
+        [BsonElement("price")]
         public double Price { get; set; }
         [Required]
+        [BsonElement("currency")]
         public string Currency { get; set; }
+
+        public virtual Category Category { get; set; }
       
     }
 }
