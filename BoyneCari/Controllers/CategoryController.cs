@@ -2,7 +2,9 @@
 using BoyneCari.Services.Categories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BoyneCari.Controllers
@@ -21,23 +23,32 @@ namespace BoyneCari.Controllers
 
         #region Methods
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetCategoryById([FromRoute] Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById([FromRoute] string id)
         {
-            return Ok(await categoryService.GetCategoryByIdAsync(id));
+            var category = await categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+                return NotFound();
+            return Ok(category);
         }
 
 
         [HttpGet("list")]
         public IActionResult GetCategories()
         {
-            return Ok(categoryService.GetCategories());
+            var categories = categoryService.GetCategories();
+            if (categories == null || !categories.Any())
+                return NotFound();
+            return Ok(categories);
 
         }
         [HttpGet("filter")]
         public IActionResult GetCategoriesFilter([FromQuery] RequestCategoryFilter model)
         {
-            return Ok(categoryService.GetCategoryFilter(model));
+            var categories = categoryService.GetCategoryFilter(model);
+            if (categories == null || !categories.Any())
+                return NotFound();
+            return Ok(categories);
         }
 
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -48,14 +59,14 @@ namespace BoyneCari.Controllers
         }
 
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [HttpPut("{id:guid}")]
-        public IActionResult UpdateCategory([FromRoute] Guid id, [FromBody] RequestCategoryUpdate request)
+        [HttpPut("{id}")]
+        public IActionResult UpdateCategory([FromRoute] string id, [FromBody] RequestCategoryUpdate request)
         {
             return Ok(categoryService.UpdateCategory(id, request));
         }
 
-        [HttpDelete("{id:guid}")]
-        public IActionResult DeleteCategory([FromRoute] Guid id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCategory([FromRoute] string id)
         {
             categoryService.DeleteCategoryById(id);
             return Ok();

@@ -2,6 +2,7 @@
 using BoyneCari.Mapper;
 using BoyneCari.Models.Requests.Category;
 using BoyneCari.Models.Responses.Category;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace BoyneCari.Services.Categories
         }
         #endregion
 
-        public async Task<ResponseGetCategory> GetCategoryByIdAsync(Guid id)
+        public async Task<ResponseGetCategory> GetCategoryByIdAsync(string id)
         {
             var category = await _categoryRepository.GetAsync(id);
             if (category == null)
@@ -42,13 +43,13 @@ namespace BoyneCari.Services.Categories
 
         }
 
-        public Guid InsertCategory(RequestCategoryInsert model)
+        public string InsertCategory(RequestCategoryInsert model)
         {
             var category = _categoryRepository.Insert(model.ToEntityInsertCategory());
             return category.Id;
         }
 
-        public Guid UpdateCategory(Guid id, RequestCategoryUpdate model)
+        public string UpdateCategory(string id, RequestCategoryUpdate model)
         {
             var category = _categoryRepository.Get(id);
             category.Name = model.Name;
@@ -57,7 +58,7 @@ namespace BoyneCari.Services.Categories
             _categoryRepository.Update(category);
             return category.Id;
         }
-        public void DeleteCategoryById(Guid id)
+        public void DeleteCategoryById(string id)
         {
             _categoryRepository.Delete(id);
         }

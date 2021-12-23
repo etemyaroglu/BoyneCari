@@ -4,5 +4,6 @@ namespace BoyneCari.Data.Repositories.Products
 {
     public interface IProductRepository : IRepository<Product>
     {
+       
     }
 }

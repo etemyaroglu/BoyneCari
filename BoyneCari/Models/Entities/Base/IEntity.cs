@@ -8,8 +8,8 @@ namespace BoyneCari.Models.Entities.Base
     public class IEntity
     {
         [BsonId]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
     }
 }

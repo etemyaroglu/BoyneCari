@@ -9,6 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using BoyneCari.Mapper;
 using BoyneCari.Data.Repositories.Categories;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace BoyneCari.Services.Products
 {
@@ -17,15 +19,20 @@ namespace BoyneCari.Services.Products
         #region .ctor
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        public ProductService(IProductRepository productRepository,ICategoryRepository categoryRepository)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
         }
         #endregion
 
-        public async Task<ResponseGetProduct> GetProductByIdAsync(Guid id)
+        public async Task<ResponseGetProduct> GetProductByIdAsync(string id)
         {
+
+            var a = _productRepository.GetCollection().Aggregate()
+                .Lookup("Category", "CategoryId", "Id", @as: "Category")
+                .As<Product>()
+                .ToEnumerable();
             var product = await _productRepository.GetAsync(id);
             if (product == null)
                 return null;
@@ -51,16 +58,16 @@ namespace BoyneCari.Services.Products
 
         }
 
-        public Guid InsertProduct(RequestProductInsert model)
+        public string InsertProduct(RequestProductInsert model)
         {
             //TODO: IsExist product Category validation
             //TODO: Currency validation
-            
+
             var product = _productRepository.Insert(model.ToEntityInsertProduct());
             return product.Id;
         }
 
-        public Guid UpdateProduct(Guid id, RequestProductUpdate model)
+        public string UpdateProduct(string id, RequestProductUpdate model)
         {
             var product = _productRepository.Get(id);
             product.Name = model.Name;
@@ -71,7 +78,7 @@ namespace BoyneCari.Services.Products
             _productRepository.Update(product);
             return product.Id;
         }
-        public void DeleteProductById(Guid id)
+        public void DeleteProductById(string id)
         {
             _productRepository.Delete(id);
         }
