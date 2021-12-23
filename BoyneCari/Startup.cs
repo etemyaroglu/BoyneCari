@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+
 namespace BoyneCari
 {
     public class Startup
@@ -42,9 +43,16 @@ namespace BoyneCari
             services.AddServices();
             services.AddRepositories();
             services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
+            services.AddDistributedRedisCache(option => {
+                option.Configuration = "127.0.0.1:6379";
+                option.InstanceName = "master";
+            });
+
 
             services.AddSingleton<IMongoDbSettings>(serviceProvider =>
                 serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
+
+
 
             services.AddMvcCore(options => options.Filters.Add(typeof(CustomExceptionFilter))).AddJsonOptions(options =>
             {

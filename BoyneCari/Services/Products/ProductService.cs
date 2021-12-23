@@ -11,24 +11,35 @@ using BoyneCari.Mapper;
 using BoyneCari.Data.Repositories.Categories;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using BoyneCari.Utilities;
+using BoyneCari.Services.RedisCache;
 
 namespace BoyneCari.Services.Products
 {
     public class ProductService : IProductService
     {
-        #region .ctor
+        #region .ctor 
+        private readonly IDistributedCache _distributedCache;
+        private readonly IRedisCache _redisCache;
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductService(
+            IProductRepository productRepository,
+            ICategoryRepository categoryRepository,
+            IDistributedCache distributedCache,
+            IRedisCache redisCache)
         {
+            _distributedCache = distributedCache;
+            _redisCache = redisCache;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
         }
         #endregion
 
         public async Task<ResponseGetProduct> GetProductByIdAsync(string id)
-        {   
-
+        { 
             var product = await _productRepository.GetAsync(id);
             if (product == null)
                 return null;
@@ -40,7 +51,10 @@ namespace BoyneCari.Services.Products
 
         public List<ResponseGetProduct> GetProducts()
         {
-            return _productRepository.GetAll().ToList().ToModelGetProducts();
+            var cachedProducts = _redisCache.GetData<List<Product>>(CacheConstants.GetAllProducts);
+            if (cachedProducts == null || !cachedProducts.Any()) 
+                return _productRepository.GetAll().ToList().ToModelGetProducts(); 
+            return cachedProducts.ToModelGetProducts();
         }
 
         public List<ResponseGetProduct> GetProductsFilter(RequestProductFilter model)
@@ -60,6 +74,7 @@ namespace BoyneCari.Services.Products
             //TODO: Currency validation
 
             var product = _productRepository.Insert(model.ToEntityInsertProduct());
+            _redisCache.SetData(CacheConstants.GetAllProducts, TimeCacheConstants.Product, product); 
             return product.Id;
         }
 
