@@ -27,12 +27,8 @@ namespace BoyneCari.Services.Products
         #endregion
 
         public async Task<ResponseGetProduct> GetProductByIdAsync(string id)
-        {
+        {   
 
-            var a = _productRepository.GetCollection().Aggregate()
-                .Lookup("Category", "CategoryId", "Id", @as: "Category")
-                .As<Product>()
-                .ToEnumerable();
             var product = await _productRepository.GetAsync(id);
             if (product == null)
                 return null;
