@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BoyneCari.Controllers
@@ -25,23 +26,29 @@ namespace BoyneCari.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById([FromRoute] string id)
         {
-            return Ok(await categoryService.GetCategoryByIdAsync(id));
+            var category = await categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+                return NotFound();
+            return Ok(category);
         }
 
 
         [HttpGet("list")]
         public IActionResult GetCategories()
         {
-            var category = categoryService.GetCategories();
-            if (category == null)
+            var categories = categoryService.GetCategories();
+            if (categories == null || !categories.Any())
                 return NotFound();
-            return Ok(category);
+            return Ok(categories);
 
         }
         [HttpGet("filter")]
         public IActionResult GetCategoriesFilter([FromQuery] RequestCategoryFilter model)
         {
-            return Ok(categoryService.GetCategoryFilter(model));
+            var categories = categoryService.GetCategoryFilter(model);
+            if (categories == null || !categories.Any())
+                return NotFound();
+            return Ok(categories);
         }
 
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
