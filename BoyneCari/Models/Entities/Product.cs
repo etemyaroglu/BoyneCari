@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BoyneCari.Models.Entities
 {
-    [BsonCollection("products")]
+    [BsonCollection("Product")]
     public class Product : IEntity
     {  
 
@@ -19,6 +19,7 @@ namespace BoyneCari.Models.Entities
         public string Description { get; set; }
         [Required]
         [BsonElement("categoryid")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string CategoryId { get; set; }
         [Required]
         [BsonElement("price")]

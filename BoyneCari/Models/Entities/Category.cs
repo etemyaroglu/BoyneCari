@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BoyneCari.Models.Entities
 {
-    [BsonCollection("categories")]
+    [BsonCollection("Category")]
     public class Category : IEntity
     {
 
