@@ -1,5 +1,6 @@
 ﻿using BoyneCari.Services.Categories;
 using BoyneCari.Services.Products;
+using BoyneCari.Services.RedisCache;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BoyneCari.Extensions
@@ -10,6 +11,7 @@ namespace BoyneCari.Extensions
         {
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ICategoryService, CategoryService>();          
+            services.AddTransient<IRedisCache, RedisCache>();          
         }
     }
 }
